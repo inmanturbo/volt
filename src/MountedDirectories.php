@@ -22,10 +22,13 @@ class MountedDirectories
      */
     public function mount(array|string $paths, array|string $uses = []): void
     {
+    
         $paths = collect(Arr::wrap($paths))
             ->filter(fn (string $path) => is_dir($path))
             ->values()
-            ->map(fn (string $path) => new MountedDirectory($path, Arr::wrap($uses)));
+            ->map(fn (string $path) => new MountedDirectory($path, Arr::wrap($uses)))
+            ->filter(fn (MountedDirectory $mountedDirectory) => ! collect($this->paths)
+                ->contains(fn (MountedDirectory $m) => $m->path === $mountedDirectory->path && $m->uses === $mountedDirectory->uses));
 
         $this->paths = array_merge($this->paths, $paths->all());
 
